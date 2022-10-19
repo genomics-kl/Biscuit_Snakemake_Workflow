@@ -17,9 +17,9 @@ rule biscuiteer:
         mem_gb = config['hpcParameters']['intermediateMemoryGb'],
         walltime = config['walltime']['medium'],
     conda:
-        '../envs/biscuit.yaml'
+        #'../envs/biscuit.yaml'
     envmodules:
-        "bbc/R/R-4.1.0-setR_LIBS_USER"
+        config['envmodules']['biscuiteer']
     shell:
         """
         Rscript --vanilla -e "library(biscuiteer); saveRDS(readBiscuit(BEDfile='{input.mergecg_gz}', VCFfile='{input.vcf}', merged=TRUE), '{output}'); sessionInfo();" 1> {log.out} 2> {log.err}
@@ -42,9 +42,9 @@ rule unionize_bsseq:
         mem_gb = config['hpcParameters']['intermediateMemoryGb'],
         walltime = config['walltime']['medium'],
     conda:
-        '../envs/biscuit.yaml'
+        #'../envs/biscuit.yaml'
     envmodules:
-        "bbc/R/R-4.1.0-setR_LIBS_USER"
+        config['envmodules']['biscuiteer']
     shell:
         """
         Rscript --vanilla -e "library(biscuiteer); saveRDS(do.call(unionize, lapply(c({params.bsseqs}), readRDS)), '{output}'); sessionInfo();" 1> {log.out} 2> {log.err}

@@ -3,9 +3,9 @@
 #     index: does not need to be different from "fasta", but might be useful if 2-bit packed reference doesn't have .fa extension or is named differently
 #     assets: prebuilt assets and scripts to build custom assets can be found at https://github.com/huishenlab/biscuit/releases/
 ref:
-    fasta: /path/to/your/fasta/file/genome.fa
-    index: /path/to/your/biscuit/index/base/that/could/be/the/same/as/fasta/genome.fa
-    assets: /path/to/your/biscuit_qc/assets
+    fasta: /varidata/research/projects/bbc/research/SZAP_20220912_invivoZBTB43_VBCS-810/wgbs/biscuit_index/mm10_gencode.fa 
+    index:  /varidata/research/projects/bbc/research/SZAP_20220912_invivoZBTB43_VBCS-810/wgbs/biscuit_index/mm10_gencode.fa
+    assets: /varidata/research/projects/bbc/research/SZAP_20220912_invivoZBTB43_VBCS-810/wgbs/mm10/
 
 # Directory where raw FASTQs live, can be absolute path or path relative to Snakefile
 fastqs: raw_data
@@ -24,7 +24,7 @@ output_directory: ''
 # seen in workflow/rules/create_assets.smk) and point to them in obs_exp['assets']
 create_assets:
     run: False
-    genome: 'hg38'
+    genome: 'mm10'
 
 # Turn on/off read trimming, handle additional trim_galore options
 #     trim_before_BISCUIT: run trimming (set as True) or not (set as False)
@@ -77,7 +77,7 @@ control_vectors: False
 # Run fastq_screen on data
 # If True - run fastq_screen with --bisulfite mode (uses Bismark)
 # If False - skip this step
-run_fastq_screen: False
+run_fastq_screen: True
 
 # fastq_screen configure file path passed to --conf in fastq_screen
 fastq_screen_conf: /primary/projects/bbc/references/fastq_screen/downloaded_20200309/FastQ_Screen_Genomes_Bisulfite/fastq_screen.conf
@@ -118,6 +118,7 @@ covg_uniformity:
 envmodules: 
     samtools: bbc/samtools/samtools-1.12
     R: bbc/R/R-4.1.0
+    biscuiteer: bbc/R/alt/R-4.2.1-setR_LIBS_USER
     snakemake: bbc/snakemake/snakemake-6.1.0
     trim_galore: bbc/trim_galore/trim_galore-0.6.0
     biscuit: bbc/biscuit/biscuit_1_0_1
