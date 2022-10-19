@@ -17,7 +17,7 @@ rule biscuiteer:
         mem_gb = config['hpcParameters']['intermediateMemoryGb'],
         walltime = config['walltime']['medium'],
     conda:
-        #'../envs/biscuit.yaml'
+        '../envs/biscuit.yaml'
     envmodules:
         config['envmodules']['biscuiteer']
     shell:
@@ -42,7 +42,7 @@ rule unionize_bsseq:
         mem_gb = config['hpcParameters']['intermediateMemoryGb'],
         walltime = config['walltime']['medium'],
     conda:
-        #'../envs/biscuit.yaml'
+        '../envs/biscuit.yaml'
     envmodules:
         config['envmodules']['biscuiteer']
     shell:
