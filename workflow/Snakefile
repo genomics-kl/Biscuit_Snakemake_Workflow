@@ -136,7 +136,13 @@ rule all:
             f'{output_directory}/analysis/region_centered_bin_averages/{{samples.sample}}.bed',
             samples=SAMPLES.itertuples(),
         ) if config['region_centered_bin_averages']['run'] else [],
-        
+
+        # biscuiteer
+        expand(
+            f'{output_directory}/analysis/biscuiteer/{{samples.sample}}.bsseq.rds',
+            samples=SAMPLES.itertuples()
+        ),
+        f'{output_directory}/analysis/biscuiteer/all.bsseq.rds', 
 # Rules for preprocessing files
 include:
     'rules/preprocessing.smk'
@@ -168,3 +174,6 @@ include:
 # Rules for creating region-centered bin averages
 include:
     'rules/region_centered_bin_averages.smk'
+
+include:
+    'rules/biscuiteer.smk'
