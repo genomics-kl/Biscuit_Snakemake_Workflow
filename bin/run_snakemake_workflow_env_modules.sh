@@ -49,6 +49,7 @@ snakemake \
     --use-envmodules \
     --jobs 20 \
     --cluster "qsub \
+    -q ${PBS_O_QUEUE} \
     -V \
     -l nodes=1:ppn={threads} \
     -l mem={resources.mem_gb}gb \
