@@ -138,11 +138,12 @@ rule all:
         ) if config['region_centered_bin_averages']['run'] else [],
 
         # biscuiteer
-        expand(
-            f'{output_directory}/analysis/biscuiteer/{{samples.sample}}.bsseq.rds',
-            samples=SAMPLES.itertuples()
-        ),
-        f'{output_directory}/analysis/biscuiteer/all.bsseq.rds', 
+        #expand(
+        #    f'{output_directory}/analysis/biscuiteer/{{samples.sample}}.bsseq.rds',
+        #    samples=SAMPLES.itertuples()
+        #),
+        f'{output_directory}/analysis/unionize_bsseq/all.bsseq.smooth.rds', 
+
 # Rules for preprocessing files
 include:
     'rules/preprocessing.smk'

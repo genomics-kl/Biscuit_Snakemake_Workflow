@@ -5,8 +5,10 @@ rule biscuiteer:
         vcf = f'{output_directory}/analysis/pileup/{{sample}}.vcf.gz',
         vcf_tbi = f'{output_directory}/analysis/pileup/{{sample}}.vcf.gz.tbi',
     output:
+        #raw=f'{output_directory}/analysis/biscuiteer/{{sample}}.bsseq.raw.rds',
         f'{output_directory}/analysis/biscuiteer/{{sample}}.bsseq.rds'
     params:
+        genome=config['biscuiteer']['genome']
     log:
         out = f'{output_directory}/logs/biscuiteer/{{sample}}.o',
         err = f'{output_directory}/logs/biscuiteer/{{sample}}.e',
@@ -22,24 +24,25 @@ rule biscuiteer:
         config['envmodules']['biscuiteer']
     shell:
         """
-        Rscript --vanilla -e "library(biscuiteer); saveRDS(readBiscuit(BEDfile='{input.mergecg_gz}', VCFfile='{input.vcf}', merged=TRUE), '{output}'); sessionInfo();" 1> {log.out} 2> {log.err}
+        Rscript --vanilla -e "library(biscuiteer); library(bsseq); library(BiocParallel); bisc <- sort(readBiscuit(BEDfile='{input.mergecg_gz}', VCFfile='{input.vcf}', merged=TRUE, genome='{params.genome}')); saveRDS(bisc, '{output}'); sessionInfo();" 1> {log.out} 2> {log.err}
         """
 
 rule unionize_bsseq:
     input:
-        expand(f'{output_directory}/analysis/biscuiteer/{{samples.sample}}.bsseq.rds', samples = SAMPLES.itertuples())
+        expand('{output_dir}/analysis/biscuiteer/{samples.sample}.bsseq.rds', samples = SAMPLES.itertuples(), output_dir=output_directory)
     output:
-        f'{output_directory}/analysis/biscuiteer/all.bsseq.rds'
+        smooth=f'{output_directory}/analysis/unionize_bsseq/all.bsseq.smooth.rds'
     params:
-        bsseqs = lambda wildcards, input: ",".join("'" + x + "'" for x in input)
+        bsseqs = lambda wildcards, input: ",".join("'" + x + "'" for x in input),
+        #output_raw=f'{output_directory}/all.bsseq.raw.rds'
     log:
         out = f'{output_directory}/logs/unionize_bsseq/out.o',
-        err = f'{output_directory}/logs/unionize_bsseq/err.e',
+        err = f'{output_directory}/logs/unionize_bsseq/out.e',
     benchmark:
         f'{output_directory}/benchmarks/unionize_bsseq/bench.txt',
-    threads: 8
+    threads: 16
     resources:
-        mem_gb = config['hpcParameters']['intermediateMemoryGb'],
+        mem_gb = config['hpcParameters']['maxMemoryGb'],
         walltime = config['walltime']['medium'],
     conda:
         '../envs/biscuit.yaml'
@@ -47,5 +50,6 @@ rule unionize_bsseq:
         config['envmodules']['biscuiteer']
     shell:
         """
-        Rscript --vanilla -e "library(biscuiteer); saveRDS(do.call(unionize, lapply(c({params.bsseqs}), readRDS)), '{output}'); sessionInfo();" 1> {log.out} 2> {log.err}
+        Rscript --vanilla -e "library(biscuiteer); library(bsseq); library(BiocParallel); all_bisc <- do.call(unionize, lapply(c({params.bsseqs}), readRDS)); all_bisc.smooth <- BSmooth(BSseq = all_bisc, BPPARAM = MulticoreParam(workers = '{threads}'), verbose = TRUE, keep.se = TRUE); saveRDS(all_bisc.smooth, '{output.smooth}', compress=FALSE); sessionInfo();" 1> {log.out} 2> {log.err}
+
         """
